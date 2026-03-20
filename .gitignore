@@ -5,6 +5,10 @@ dev-ignore/
 report.md
 eval_bundle/
 
+# Dataset (large parquet shards and raw downloads)
+dataset/*.parquet
+dataset/raw/
+
 # Secrets
 .env
 

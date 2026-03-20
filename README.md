@@ -20,12 +20,34 @@ Presently, the main focus of development is on tuning the pretraining stage, whi
 | 4 | 2.02 | 0.71854 | 0.2571 | change dataset to NVIDIA ClimbMix | Mar 4 2026 | 324e69c | @ddudek @karpathy |
 | 5 | 1.80 | 0.71808 | 0.2690 | autoresearch [round 1](https://x.com/karpathy/status/2031135152349524125) | Mar 9 2026 | 6ed7d1d | @karpathy |
 | 5 | 1.65 | 0.71800 | 0.2626 | autoresearch round 2 | Mar 14 2026 | a825e63 | @karpathy |
+| 6 | TBD | TBD | TBD | switch to Portuguese Carolina corpus | Mar 20 2026 | TBD | @alfakini |
 
 The primary metric we care about is "time to GPT-2" - the wall clock time needed to outperform the GPT-2 (1.6B) CORE metric on an 8XH100 GPU node. The GPT-2 CORE score is 0.256525. In 2019, the training of GPT-2 cost approximately $43,000 so it is incredible that due to many advances over 7 years across the stack, we can now do so much faster and for well below $100 (e.g. at the current ~$3/GPU/hr, an 8XH100 node is ~$24/hr, so 2 hours is ~$48).
 
 See [dev/LEADERBOARD.md](dev/LEADERBOARD.md) for more docs on how to interpret and contribute to the leaderboard.
 
 ## Getting started
+
+### Portuguese Dataset
+
+nanochat uses the [Carolina corpus](https://huggingface.co/datasets/carolina-c4ai/corpus-carolina) for pretraining, a large Brazilian Portuguese text corpus (~3GB, ~2M documents) from the University of Sao Paulo's C4AI.
+
+The dataset is hosted at [alfakini/carolina-corpus-shuffled](https://huggingface.co/datasets/alfakini/carolina-corpus-shuffled) and is automatically downloaded on-demand.
+
+To download shards manually:
+```bash
+uv run python -m nanochat.dataset -n 50  # download 50 shards + validation
+```
+
+To contribute a converted dataset:
+```bash
+# Download and convert
+python dev/download_carolina.py --output dataset/raw/
+python dev/repackage_carolina.py --input dataset/raw/ --output dataset/
+
+# Upload to HuggingFace
+python dev/repackage_carolina.py --upload --input dataset/
+```
 
 ### Reproduce and talk to GPT-2
 
@@ -122,9 +144,11 @@ I've published a number of guides that might contain helpful information, most r
 ├── LICENSE
 ├── README.md
 ├── dev
+│   ├── download_carolina.py        # Download Carolina corpus XML files
 │   ├── gen_synthetic_data.py       # Example synthetic data for identity
 │   ├── generate_logo.html
 │   ├── nanochat.png
+│   ├── repackage_carolina.py       # Repackage Carolina XML to parquet shards
 │   └── repackage_data_reference.py # Pretraining data shard generation
 ├── nanochat
 │   ├── __init__.py                 # empty
@@ -183,6 +207,7 @@ Current AI policy: disclosure. When submitting a PR, please declare any parts th
 - The name (nanochat) derives from my earlier project [nanoGPT](https://github.com/karpathy/nanoGPT), which only covered pretraining.
 - nanochat is also inspired by [modded-nanoGPT](https://github.com/KellerJordan/modded-nanogpt), which gamified the nanoGPT repo with clear metrics and a leaderboard, and borrows a lot of its ideas and some implementation for pretraining.
 - Thank you to [HuggingFace](https://huggingface.co/) for fineweb and smoltalk.
+- Thank you to [Carolina C4AI](https://huggingface.co/datasets/carolina-c4ai/corpus-carolina) for the Brazilian Portuguese corpus.
 - Thank you [Lambda](https://lambda.ai/service/gpu-cloud) for the compute used in developing this project.
 - Thank you to chief LLM whisperer 🧙‍♂️ Alec Radford for advice/guidance.
 - Thank you to the repo czar Sofie [@svlandeg](https://github.com/svlandeg) for help with managing issues, pull requests and discussions of nanochat.
